@@ -1,23 +1,19 @@
-name: Security and Access
+name: Runner Logs Demo
 
 on:
   push:
     branches:
       - main
 
-permissions:
-  contents: read
-
 jobs:
-  secure-job:
+  log-job:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Print message
+        run: echo "Hello from GitHub Actions Runner"
 
-      - name: Verify token availability
-        run: echo "Access token loaded successfully"
+      - name: Show current directory
+        run: pwd
 
-        env:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      - name: List files
+        run: ls -la
