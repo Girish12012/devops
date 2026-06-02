@@ -1,19 +1,33 @@
-name: Runner Logs Demo
+name: Push to GHCR
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  log-job:
+  build-and-push:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Print message
-        run: echo "Hello from GitHub Actions Runner"
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Show current directory
-        run: pwd
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.ACCESS_TOKEN }}
 
-      - name: List files
-        run: ls -la
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/single-html-page:latest .
+
+      - name: Push Docker image to GHCR
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/single-html-page:latest
