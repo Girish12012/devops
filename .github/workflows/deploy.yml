@@ -1,4 +1,4 @@
-name: Artifact Download
+name: Multi-Job Workflow
 
 on:
   push:
@@ -6,28 +6,31 @@ on:
       - main
 
 jobs:
-  upload-artifact:
+  check-file:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Upload HTML artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: html-page
-          path: index.html
+      - name: Check HTML file exists
+        run: test -f index.html
 
-  download-artifact:
+  validate-html:
     runs-on: ubuntu-latest
-    needs: upload-artifact
+    needs: check-file
     steps:
-      - name: Download HTML artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: html-page
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Verify artifact
-        run: |
-          ls -la
-          cat index.html
+      - name: Validate HTML tag
+        run: grep -q "<html>" index.html
+
+  deploy-preview:
+    runs-on: ubuntu-latest
+    needs: validate-html
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Print deployment message
+        run: echo "Single HTML page is ready for deployment"
